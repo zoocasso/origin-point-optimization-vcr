@@ -24,11 +24,11 @@ The total quantization error depends on which image is the origin:
 $$E(P) = \sum_{k=0}^{L-1} \left| (k-P)S - \mathrm{round}\big((k-P)S\big) \right|, \qquad P^{*} = \arg\min_{P \in \{0,\dots,L-1\}} E(P)$$
 
 - **2025 (iterative):** reconstruct with every candidate origin and keep the best image, which takes $L_x \times L_y$ full reconstructions.
-- **2026 (accelerated):** $E(P)$ needs only the camera parameters, so $P^{*}$ is found per axis without touching the images. The result is the same origin and image quality, with one reconstruction.
+- **2026 (accelerated):** $E(P)$ needs only the camera parameters, so $P^{*}$ is found per axis without touching the images. In the paper's experiments it found the same origin as the iterative search, with one reconstruction.
 
 ## Results reported in the papers
 
-The two papers use different scenes, image sizes and evaluation pipelines, so their numbers should not be compared with each other.
+ITC-CSCC 2025 measured image quality; ITC-CSCC 2026 measured speed.
 
 ### ITC-CSCC 2025 — moving the origin improves image quality
 
@@ -50,18 +50,11 @@ Real object captured with a camera: 9 × 9 elemental images of 4178 × 2752 px, 
 | Nonuniform VCR | 33.1142 | 0.9692 | 28.1018 |
 | Optimized origin point VCR | 34.6421 | 0.9763 | 19.1821 |
 
-### ITC-CSCC 2026 — same quality with one reconstruction instead of 81
+### ITC-CSCC 2026 — the same origin with one reconstruction instead of 81
 
-Simulation with a 1951 USAF chart: 9 × 9 elemental images of 1000 × 1000 px, f = 50 mm, pitch 30 mm, depth 4 m. Metrics are computed on a 180 × 180 center crop.
+In the paper's experiments, the accelerated method found the same origin as the iterative search, so the reconstruction was identical: the same PSNR, SSIM and MSE (USAF chart simulation) and the same YOLOv8n IoU and mAP (real toy-car scene). The gain is in time.
 
-| Method | PSNR | SSIM | MSE |
-|---|---:|---:|---:|
-| Fixed VCR | 24.249 | 0.865 | 239.311 |
-| Nonuniform VCR | 26.576 | 0.909 | 139.950 |
-| Optimized origin point VCR (2025, iterative) | 27.816 | 0.916 | 104.785 |
-| Proposed VCR (2026, accelerated) | 27.816 | 0.916 | 104.785 |
-
-Time for 9 × 9 elemental images:
+Time for 9 × 9 elemental images of 1000 × 1000 px:
 
 | Method | One reconstruction | Origin search | Total |
 |---|---:|---:|---:|
@@ -69,8 +62,6 @@ Time for 9 × 9 elemental images:
 | Accelerated, CPU | 0.3142 s | 0.0002 s | 0.3144 s |
 | Iterative, GPU (CuPy, RTX 3090) | 0.0055 s | 81 reconstructions | 0.4455 s |
 | Accelerated, GPU (CuPy, RTX 3090) | 0.0055 s | 0.0002 s | 0.0057 s |
-
-The paper also checks object detection on a real toy-car scene (YOLOv8n). There, the accelerated method gives the same IoU (0.9780) and mAP (0.9950) as the iterative one. The detection pipeline is not part of this repository.
 
 ## Files
 
@@ -119,7 +110,7 @@ result = reconstruct_method(images, s, s, "relocated", origin=(px, py))
 - Rounding is half-up, `floor(x + 0.5)`, as in the papers. $E(P)$ is evaluated with `Decimal`, so exact .5 cases do not flip because of floating-point error.
 - When several origins give the same minimum error, `accelerated_origin` returns the smallest index.
 - In the papers, the iterative search time is the single reconstruction time × 81. `benchmark.py` prints the same estimate on your hardware.
-- The elemental image datasets (simulation and lab captures) are not included.
+- The elemental image datasets (simulation and lab captures) and the YOLO detection pipeline are not included.
 
 ## Tested
 
