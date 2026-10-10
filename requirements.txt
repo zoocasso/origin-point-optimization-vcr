@@ -1,0 +1,6 @@
+numpy>=1.24
+opencv-python>=4.8
+scikit-image>=0.21
+pytest>=7
+# optional, for benchmark.py --gpu (pick the build that matches your CUDA version)
+# cupy-cuda12x
