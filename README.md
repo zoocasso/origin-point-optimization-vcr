@@ -26,7 +26,31 @@ $$E(P) = \sum_{k=0}^{L-1} \left| (k-P)S - \mathrm{round}\big((k-P)S\big) \right|
 - **2025 (iterative):** reconstruct with every candidate origin and keep the best image, which takes $L_x \times L_y$ full reconstructions.
 - **2026 (accelerated):** $E(P)$ needs only the camera parameters, so $P^{*}$ is found per axis without touching the images. The result is the same origin and image quality, with one reconstruction.
 
-## Results reported in ITC-CSCC 2026
+## Results reported in the papers
+
+The two papers use different scenes, image sizes and evaluation pipelines, so their numbers should not be compared with each other.
+
+### ITC-CSCC 2025 — moving the origin improves image quality
+
+Metrics are computed against the central elemental image. In the simulation, the optimized origin gives about 40 % lower MSE than nonuniform VCR (5.5078 → 3.3410).
+
+Simulation with a 1951 USAF chart rendered in Unity: 9 × 9 elemental images of 3000 × 3000 px, object at 3,100 mm.
+
+| Method | PSNR | SSIM | MSE |
+|---|---:|---:|---:|
+| Fixed VCR | 34.2666 | 0.9736 | 23.4585 |
+| Nonuniform VCR | 40.5041 | 0.9884 | 5.5078 |
+| Optimized origin point VCR | 42.6161 | 0.9908 | 3.3410 |
+
+Real object captured with a camera: 9 × 9 elemental images of 4178 × 2752 px, object at 420 mm.
+
+| Method | PSNR | SSIM | MSE |
+|---|---:|---:|---:|
+| Fixed VCR | 28.3032 | 0.8962 | 92.8568 |
+| Nonuniform VCR | 33.1142 | 0.9692 | 28.1018 |
+| Optimized origin point VCR | 34.6421 | 0.9763 | 19.1821 |
+
+### ITC-CSCC 2026 — same quality with one reconstruction instead of 81
 
 Simulation with a 1951 USAF chart: 9 × 9 elemental images of 1000 × 1000 px, f = 50 mm, pitch 30 mm, depth 4 m. Metrics are computed on a 180 × 180 center crop.
 
